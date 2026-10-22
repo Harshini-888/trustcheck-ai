@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrustCheck AI — Check Before You Trust</title>
+
+<style>
+:root {
+  --bg: #0b1020;
+  --panel: #131b31;
+  --text: #eef3ff;
+  --muted: #aab6d3;
+  --line: #2b3858;
+  --accent: #79e2c0;
+  --blue: #8ab4ff;
+  --red: #ff7f8b;
+  --yellow: #ffd479;
+  --green: #7ee0a1;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at top, #18274a, var(--bg) 65%);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  line-height: 1.55;
+}
+
+.wrap {
+  max-width: 1100px;
+  margin: auto;
+  padding: 25px 18px 45px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 38px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.logo {
+  background: linear-gradient(135deg, var(--accent), var(--blue));
+  color: #071321;
+  padding: 9px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.pill, .tag {
+  border: 1px solid var(--line);
+  border-radius: 25px;
+  padding: 6px 11px;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.hero {
+  text-align: center;
+  max-width: 760px;
+  margin: auto auto 30px;
+}
+
+.eyebrow {
+  color: var(--accent);
+  letter-spacing: 3px;
+  font-size: .8rem;
+  font-weight: bold;
+}
+
+h1 {
+  font-size: clamp(2.4rem, 7vw, 4rem);
+  line-height: 1.08;
+  margin: 15px 0;
+}
+
+.hero p, .sub, .note, .footer {
+  color: var(--muted);
+}
+
+.hero p { font-size: 1.05rem; }
+
+.tags {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.panel {
+  background: rgba(19, 27, 49, .96);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+}
+
+h2 { margin-top: 0; font-size: 1.15rem; }
+.sub { font-size: .9rem; }
+
+label {
+  display: block;
+  margin: 15px 0 7px;
+  font-weight: bold;
+}
+
+textarea, select {
+  width: 100%;
+  background: #0b1327;
+  color: var(--text);
+  border: 1px solid #364563;
+  border-radius: 12px;
+  padding: 13px;
+  font: inherit;
+}
+
+textarea {
+  min-height: 180px;
+  resize: vertical;
+}
+
+textarea:focus, select:focus {
+  outline: 2px solid var(--blue);
+}
+
+.counter {
+  text-align: right;
+  color: var(--muted);
+  font-size: .8rem;
+  margin-top: 5px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 15px;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font: inherit;
+  font-weight: bold;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.primary {
+  background: var(--accent);
+  color: #08201c;
+}
+
+.secondary {
+  background: #24314d;
+  color: var(--text);
+  border: 1px solid #3a4b6b;
+}
+
+button:hover { filter: brightness(1.1); }
+
+.privacy, .note {
+  font-size: .83rem;
+  margin-top: 15px;
+}
+
+.privacy { color: var(--muted); }
+.privacy strong { color: var(--accent); }
+
+.empty {
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--muted);
+}
+
+.shield { font-size: 2.6rem; }
+
+.empty strong {
+  display: block;
+  color: var(--text);
+  margin: 8px;
+}
+
+.results { display: none; }
+
+.riskhead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.risk {
+  font-size: .78rem;
+  font-weight: bold;
+  border-radius: 20px;
+  padding: 7px 10px;
+  background: #26334e;
+}
+
+.risk.high { background: #512532; color: var(--red); }
+.risk.medium { background: #4a3a20; color: var(--yellow); }
+.risk.low { background: #183d36; color: var(--green); }
+
+.score { color: var(--muted); font-size: .83rem; }
+.intro { color: var(--muted); }
+
+.section-title {
+  font-size: 1rem;
+  margin: 22px 0 9px;
+}
+
+.finding, .step {
+  background: #0e172b;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 8px 0;
+}
+
+.finding b { display: block; margin-bottom: 5px; }
+.finding p, .step p { margin: 0; font-size: .89rem; color: var(--muted); }
+.finding .evidence { color: #e7edff; margin-top: 7px; overflow-wrap: anywhere; }
+
+.step { display: flex; gap: 10px; }
+
+.number {
+  flex: 0 0 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #243753;
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.disclaimer {
+  margin-top: 17px;
+  padding: 12px;
+  background: #2a251b;
+  border-left: 3px solid var(--yellow);
+  color: #e7d7b3;
+  font-size: .83rem;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 28px;
+  font-size: .82rem;
+}
+
+@media (max-width: 780px) {
+  .grid { grid-template-columns: 1fr; }
+  .panel { padding: 17px; }
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="logo">T✓</span>
+      <span>TrustCheck AI</span>
+    </div>
+    <span class="pill">Privacy-first prototype</span>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">PAUSE · CHECK · VERIFY</div>
+    <h1>Check before<br>you trust.</h1>
+    <p>
+      Review a suspicious message or payment request.
+      Understand its warning signs and choose safer next steps
+      before you respond.
+    </p>
+    <div class="tags">
+      <span class="tag">Message checks</span>
+      <span class="tag">Evidence explained</span>
+      <span class="tag">Safety guidance</span>
+    </div>
+  </section>
+
+  <main class="grid">
+
+    <section class="panel">
+      <h2>Check a message</h2>
+      <p class="sub">
+        Paste the message below. Remove names, phone numbers,
+        account details and other private information first.
+      </p>
+
+      <label for="message">Message to review</label>
+      <textarea id="message" maxlength="10000"
+        placeholder="Example: Your account will be blocked today. Share your OTP to avoid suspension..."></textarea>
+
+      <div class="counter" id="counter">0 / 10000</div>
+
+      <label for="kind">Message category</label>
+      <select id="kind">
+        <option value="general">General / not sure</option>
+        <option value="payment">Payment or money request</option>
+        <option value="account">Bank or account alert</option>
+        <option value="job">Job, prize or offer</option>
+        <option value="delivery">Delivery or parcel message</option>
+      </select>
+
+      <div class="actions">
+        <button class="primary" id="analyse">Analyse warning signs</button>
+        <button class="secondary" id="sample">Try suspicious example</button>
+        <button class="secondary" id="clear">Clear</button>
+      </div>
+
+      <div class="privacy">
+        <strong>● Privacy:</strong>
+        This prototype analyses the text in your browser.
+        It does not send your message to a server or save it.
+      </div>
+
+      <p class="note">
+        Never enter or share an OTP, PIN, password, CVV or banking
+        credentials with anyone.
+      </p>
+    </section>
+
+    <section class="panel" aria-live="polite">
+      <div class="empty" id="empty">
+        <div>
+          <div class="shield">🛡️</div>
+          <strong>Your review will appear here</strong>
+          Paste a message and select Analyse warning signs.
+        </div>
+      </div>
+
+      <div class="results" id="results">
+        <h2>Review summary</h2>
+
+        <div class="riskhead">
+          <span class="risk" id="risk">REVIEW NEEDED</span>
+          <span class="score" id="score"></span>
+        </div>
+
+        <p class="intro" id="summary"></p>
+
+        <h3 class="section-title">Warning signs found</h3>
+        <div id="findings"></div>
+
+        <h3 class="section-title">Safer next steps</h3>
+        <div id="steps"></div>
+
+        <div class="disclaimer">
+          <strong>Important:</strong> This is a rule-based prototype,
+          not a definitive verdict. A low-risk result does not prove
+          a message is genuine, and a warning does not prove it is
+          a scam. Verify independently before acting.
+        </div>
+      </div>
+    </section>
+
+  </main>
+<section class="panel" style="margin-top:20px">
+  <h2>Detection Test Lab</h2>
+  <p class="sub">
+    Test the current detection rules against sample messages.
+    These are prototype checks, not proof of real-world accuracy.
+  </p>
+
+  <button class="primary" id="runTests">
+    Run Automated Tests
+  </button>
+
+  <div id="testReport" style="margin-top:18px"></div>
+</section>
+<section class="panel" style="margin-top:20px">
+  <h2>Safety Action Center</h2>
+  <p class="sub">
+    Choose your situation to see practical steps you can take.
+  </p>
+
+  <label for="safetySituation">What happened?</label>
+
+  <select id="safetySituation">
+    <option value="received">I received a suspicious message</option>
+    <option value="clicked">I clicked a suspicious link</option>
+    <option value="shared">I shared personal information</option>
+    <option value="money">I already sent money</option>
+  </select>
+
+  <button class="primary" id="showSafety" style="margin-top:12px">
+    Show safety steps
+  </button>
+
+  <div id="safetyResults" aria-live="polite" style="margin-top:18px"></div>
+
+  <div style="margin-top:18px;padding:14px;background:#0e172b;
+              border:1px solid #2b3858;border-radius:12px">
+    <strong>India cybercrime support</strong>
+    <p class="sub" style="margin-bottom:10px">
+      If you have lost money to online financial fraud, contact
+      your bank or payment provider immediately.
+    </p>
+    <p>
+      <strong>Helpline:</strong> 1930
+    </p>
+    <a href="https://www.cybercrime.gov.in/"
+       target="_blank" rel="noopener noreferrer"
+       style="color:#79e2c0">
+      Visit the official National Cyber Crime Reporting Portal ↗
+    </a>
+  </div>
+</section>
+  <div class="footer">
+    TrustCheck AI · Student innovation prototype · Helping people make safer decisions
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const messageInput = $("message");
+
+messageInput.addEventListener("input", () => {
+  $("counter").textContent =
+    messageInput.value.length + " / 10000";
+});
+
+$("sample").addEventListener("click", () => {
+  messageInput.value =
+    "URGENT: Your bank account will be blocked today. " +
+    "Verify now using this link: http://example.invalid/verify " +
+    "and send your OTP to avoid suspension. " +
+    "A processing fee may be required.";
+
+  $("kind").value = "account";
+  messageInput.dispatchEvent(new Event("input"));
+});
+
+$("clear").addEventListener("click", () => {
+  messageInput.value = "";
+  messageInput.dispatchEvent(new Event("input"));
+  $("results").style.display = "none";
+  $("empty").style.display = "grid";
+  messageInput.focus();
+});
+
+function analyseMessage(text, kind) {
+  const findings = [];
+
+  const rules = [
+    {
+      id: "otp",
+      title: "Sensitive authentication information mentioned",
+      pattern: /\b(OTP|one[\s-]?time password|PIN|password|passcode|CVV)\b/i,
+      explanation:
+        "The message mentions a sensitive authentication or payment secret. Never disclose your OTP, PIN, password or CVV to someone contacting you.",
+      points: 5
+    },
+    {
+      id: "urgency",
+      title: "Pressure to act immediately",
+      pattern: /\b(urgent|immediately|right now|within \d+ minutes?|today only|act now|last warning|expires today|final notice)\b/i,
+      explanation:
+        "Time pressure can make people act before checking whether a request is genuine.",
+      points: 2
+    },
+    {
+      id: "threat",
+      title: "Threat of account or service loss",
+      pattern: /\b(account.{0,25}(blocked|suspended|closed|frozen)|will be (blocked|suspended)|legal action|arrest warrant|service.{0,15}disconnected)\b/i,
+      explanation:
+        "Verify threats about account suspension, legal action or disconnection through a trusted official channel.",
+      points: 3
+    },
+    {
+      id: "fee",
+      title: "Advance fee or payment request",
+      pattern: /\b(processing fee|release fee|pay (first|in advance)|advance payment|registration fee|clearance fee|customs fee|deposit to receive)\b/i,
+      explanation:
+        "Paying first to unlock a prize, job, parcel, loan or benefit is a warning sign. Verify the request independently.",
+      points: 3
+    },
+    {
+      id: "prize",
+      title: "Unexpected prize or reward",
+      pattern: /\b(you (have )?won|winner|claim your prize|free gift|guaranteed (profit|returns?)|lottery prize|reward waiting)\b/i,
+      explanation:
+        "Unexpected rewards and guaranteed returns can be used to persuade people to share information or send money.",
+      points: 2
+    },
+    {
+      id: "remote",
+      title: "Remote-access software mentioned",
+      pattern: /\b(anydesk|teamviewer|remote access|screen sharing app|allow remote control)\b/i,
+      explanation:
+        "Remote-access software may let another person view or control your device. Do not install it at a stranger's request.",
+      points: 4
+    },
+    {
+      id: "link",
+      title: "A web link is included",
+      pattern: /\bhttps?:\/\/[^\s]+|www\.[^\s]+/i,
+      explanation:
+        "Unexpected links deserve caution. A link alone does not prove fraud; independently verify the sender and destination.",
+      points: 1
+    },
+    {
+      id: "payment",
+      title: "Direct payment or QR request",
+      pattern: /\b(scan (this )?QR|send (the )?(money|payment)|pay (now|immediately)|transfer (the )?money|UPI ID|collect request|approve.{0,15}(payment|UPI))\b/i,
+      explanation:
+        "Verify the recipient and reason for payment independently. Never enter a UPI PIN just to receive money.",
+      points: 3
+    },
+    {
+      id: "secrecy",
+      title: "Request to keep a transaction secret",
+      pattern: /\b(don't tell anyone|do not tell anyone|keep this secret|tell nobody)\b/i,
+      explanation:
+        "Pressure to hide a transaction can prevent you from checking the request or getting help.",
+      points: 3
+    },
+    {
+      id: "job",
+      title: "Job or income offer needs verification",
+      pattern: /\b(job offer|work from home|easy money|task job|recharge to earn|pay to get hired|daily income)\b/i,
+      explanation:
+        "Be cautious if a job promises easy income or asks you to pay or recharge money to unlock tasks.",
+      points: 2
+    },
+    {
+      id: "identity",
+      title: "Personal or identity details mentioned",
+      pattern: /\b(Aadhaar|PAN card|bank details|card number|date of birth|identity proof|KYC update)\b/i,
+      explanation:
+        "Only provide sensitive personal information through a verified official channel when genuinely necessary.",
+      points: 2
+    }
+  ];
+
+  for (const rule of rules) {
+    const match = text.match(rule.pattern);
+
+    if (match) {
+      findings.push({
+        title: rule.title,
+        explanation: rule.explanation,
+        evidence: "Matched text: “" + match[0].slice(0, 150) + "”",
+        points: rule.points
+      });
+    }
+  }
+
+  const score = Math.min(
+    100,
+    findings.reduce((total, item) => total + item.points, 0) * 10
+  );
+
+  let level;
+  let summary;
+
+  if (
+    findings.some(item => item.points === 5) ||
+    findings.some(item => item.title.includes("Remote-access")) ||
+    score >= 60
+  ) {
+    level = "high";
+    summary =
+      "Several strong warning indicators were found. Do not share secrets, install software or send money based on this message. Verify independently.";
+  } else if (score >= 30) {
+    level = "medium";
+    summary =
+      "Some warning indicators were found. Pause and verify the sender and request through a separate, trusted channel before acting.";
+  } else {
+    level = "low";
+    summary =
+      "Few known warning patterns were detected. This does not mean the message is genuine; the current rules may miss scams.";
+  }
+
+  if (findings.length === 0) {
+    findings.push({
+      title: "No known warning pattern matched",
+      explanation:
+        "The current rules did not identify a recognised pattern. Carefully worded or new scams may still be missed.",
+      evidence: "No rule matched the message text.",
+      points: 0
+    });
+  }
+
+  const steps = [];
+
+  if (kind === "account") {
+    steps.push(
+      "Open your bank or service provider's official app yourself to check account alerts. Do not use an unexpected message link."
+    );
+  } else if (kind === "payment") {
+    steps.push(
+      "Verify the recipient and reason for payment independently. Reject unexpected collect requests."
+    );
+  } else if (kind === "job") {
+    steps.push(
+      "Check the employer using its official website. Be especially cautious if you must pay or recharge money to get work."
+    );
+  } else if (kind === "delivery") {
+    steps.push(
+      "Check parcel status using the courier's official app or website and your existing tracking number."
+    );
+  }
+
+  steps.push(
+    "Do not reply, pay, scan a QR code or open an unexpected link until you have checked the request.",
+    "Contact the organisation through its official app, website typed manually, or a trusted phone number—not details in the message.",
+    "Never share your OTP, PIN, password, CVV or screen access. A UPI PIN authorises payments; it is not needed to receive money.",
+    "If you have already sent money or shared account details, contact your bank or payment provider immediately and use official cybercrime reporting channels in your country."
+  );
+
+  return { findings, score, level, summary, steps };
+}
+
+$("analyse").addEventListener("click", () => {
+  const text = messageInput.value.trim();
+
+  if (!text) {
+    alert("Please paste a message to review first.");
+    messageInput.focus();
+    return;
+  }
+
+  const result = analyseMessage(text, $("kind").value);
+
+  $("empty").style.display = "none";
+  $("results").style.display = "block";
+
+  const risk = $("risk");
+  risk.className = "risk " + result.level;
+
+  risk.textContent =
+    result.level === "high"
+      ? "HIGHER RISK INDICATORS"
+      : result.level === "medium"
+      ? "CAUTION — REVIEW"
+      : "FEW KNOWN INDICATORS";
+
+  $("score").textContent = "Rule score: " + result.score + "/100";
+  $("summary").textContent = result.summary;
+
+  const findingsBox = $("findings");
+  findingsBox.replaceChildren();
+
+  result.findings.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "finding";
+
+    const title = document.createElement("b");
+    title.textContent = item.title;
+
+    const explanation = document.createElement("p");
+    explanation.textContent = item.explanation;
+
+    const evidence = document.createElement("p");
+    evidence.className = "evidence";
+    evidence.textContent = item.evidence;
+
+    card.append(title, explanation, evidence);
+    findingsBox.append(card);
+  });
+
+  const stepsBox = $("steps");
+  stepsBox.replaceChildren();
+
+  result.steps.forEach((step, index) => {
+    const card = document.createElement("div");
+    card.className = "step";
+
+    const number = document.createElement("span");
+    number.className = "number";
+    number.textContent = index + 1;
+
+    const text = document.createElement("p");
+    text.textContent = step;
+
+    card.append(number, text);
+    stepsBox.append(card);
+  });
+});
+const testCases = [
+  {
+    name: "OTP request with account threat",
+    message:
+      "Urgent! Your account will be blocked. Send your OTP now to avoid suspension.",
+    expected: "high"
+  },
+  {
+    name: "Prize with advance fee",
+    message:
+      "You have won a prize. Pay a processing fee to claim your prize.",
+    expected: "medium"
+  },
+  {
+    name: "Urgent payment request",
+    message:
+      "Urgent! Transfer the money immediately to this UPI ID.",
+    expected: "medium"
+  },
+  {
+    name: "Remote access request",
+    message:
+      "Install AnyDesk and allow remote access to fix your bank account.",
+    expected: "high"
+  },
+  {
+    name: "Ordinary friendly message",
+    message:
+      "Hi, are we meeting at the library at 4 pm? Bring your notebook.",
+    expected: "low"
+  }
+];
+
+$("runTests").addEventListener("click", () => {
+  const report = $("testReport");
+  report.replaceChildren();
+
+  let passed = 0;
+
+  testCases.forEach((test, index) => {
+    const result = analyseMessage(test.message, "general");
+    const success = result.level === test.expected;
+
+    if (success) passed++;
+
+    const card = document.createElement("div");
+    card.style.cssText =
+      "padding:13px;margin:10px 0;border:1px solid #2b3858;" +
+      "border-radius:12px;background:#0e172b";
+
+    const title = document.createElement("strong");
+    title.textContent = `${index + 1}. ${test.name}`;
+
+    const status = document.createElement("p");
+    status.style.color = success ? "#7ee0a1" : "#ff7f8b";
+    status.textContent = success ? "PASS" : "FAIL";
+
+    const details = document.createElement("p");
+    details.style.color = "#aab6d3";
+    details.style.fontSize = ".9rem";
+    details.textContent =
+      `Expected: ${test.expected.toUpperCase()} | ` +
+      `Detected: ${result.level.toUpperCase()}`;
+
+    card.append(title, status, details);
+    report.append(card);
+  });
+
+  const heading = document.createElement("h3");
+  heading.textContent = `Test results: ${passed}/${testCases.length} passed`;
+  report.prepend(heading);
+
+  const note = document.createElement("p");
+  note.style.color = "#aab6d3";
+  note.textContent =
+    `Sample-test agreement: ${Math.round(
+      passed / testCases.length * 100
+    )}%. This applies only to these ${testCases.length} examples, ` +
+    "not to real-world scam detection.";
+
+  report.append(note);
+});
+const safetyGuides = {
+  received: {
+    title: "If you received a suspicious message",
+    steps: [
+      "Pause. Do not rush to reply, pay, or open links.",
+      "Contact the sender or organisation through a trusted, separate channel.",
+      "Never share OTPs, PINs, passwords, or payment authorisation codes.",
+      "Use the messaging app's report or block feature when appropriate."
+    ]
+  },
+
+  clicked: {
+    title: "If you clicked a suspicious link",
+    steps: [
+      "Close the suspicious page. Do not download files or approve prompts.",
+      "If you downloaded a file or installed an app, avoid opening it and seek trusted technical help.",
+      "If you entered a password, change it using the genuine official website or app. Secure any other account using the same password.",
+      "If you approved a payment or entered payment details, contact your bank or payment provider promptly."
+    ]
+  },
+
+  shared: {
+    title: "If you shared personal information",
+    steps: [
+      "Identify what information you shared and which account or service it relates to.",
+      "Change exposed passwords and enable two-factor authentication where available.",
+      "Contact your bank immediately if banking or payment details were exposed.",
+      "Watch for unexpected login alerts, transactions, or follow-up messages."
+    ]
+  },
+
+  money: {
+    title: "If you already sent money",
+    steps: [
+      "Contact your bank or payment provider immediately and explain the suspected fraud.",
+      "In India, call 1930 promptly to report financial cyber fraud.",
+      "Submit a report through the official National Cyber Crime Reporting Portal.",
+      "Keep transaction IDs, receipts, messages, and screenshots as evidence. Never pay an additional fee to someone promising guaranteed recovery."
+    ]
+  }
+};
+
+$("showSafety").addEventListener("click", () => {
+  const selected = $("safetySituation").value;
+  const guide = safetyGuides[selected];
+  const container = $("safetyResults");
+
+  container.replaceChildren();
+
+  const heading = document.createElement("h3");
+  heading.textContent = guide.title;
+  container.append(heading);
+
+  guide.steps.forEach((step, index) => {
+    const card = document.createElement("div");
+    card.className = "step";
+
+    const number = document.createElement("span");
+    number.className = "number";
+    number.textContent = String(index + 1);
+
+    const text = document.createElement("p");
+    text.textContent = step;
+
+    card.append(number, text);
+    container.append(card);
+  });
+});
+</script>
+</body>
+</html>
